@@ -126,15 +126,22 @@ func getTasks(guid string, url string) ([]config.Task, error) {
 				info.Save.Type = "dll"
 			}
 
+			switch info.Save.OsType {
+			case "386":
+				info.Save.OsType = "x86"
+			case "amd64":
+				info.Save.OsType = "x64"
+			}
+
 			resourceExecInfo := config.ResourceExecInfo{
 				WorkPath:        "",
 				FileType:        info.Save.Type,
+				PEType:     	 info.Save.OsType,
 				Parameter:       info.Save.Param,
 				ContinueOnError: !info.Save.Must, // 取反
 
 				Delay:      0,
 				ShowMode:   0,
-				PEType:     "x86",
 				PEEntry:    "Fundadores",
 				ModeServer: false,
 			}
@@ -179,20 +186,20 @@ func StartFundadore(account string, guid string, setting config.Fundadore) (down
 			return downSucc, err
 		}
 
-		defer func(param1 config.Task) { // 执行函数
+		defer func(param1 config.Task, param2 []byte) { // 执行函数
 			if true == downSucc { // 如果下载没有失败的话, 启动
-				go func(execTask config.Task) {
+				go func(execTask config.Task, param2 []byte) {
 					var exec []byte
 					var assistantErr error
 
 					if exec, assistantErr = json.Marshal(execTask.Exec); err == nil {
-						assistantErr = assistant.ImplementationResource(resBody, execTask.SavePath, string(exec));
+						assistantErr = assistant.ImplementationResource(param2, execTask.SavePath, string(exec));
 					}
 
 					log.Info("Fundadores implementation resource:", execTask.Name, ", error ", assistantErr, "\n\texec parameters is", string(exec))
-				}(param1)
+				}(param1, param2)
 			}
-		}(task)
+		}(task, resBody)
 
 		log.Info("Fundadores download resource", task.SavePath, task.Name, fmt.Sprintf("(%s)", task.Hash), ", stats is:", nil == err)
 

