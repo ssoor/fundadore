@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"compress/zlib"
 	"crypto/aes"
 	"crypto/cipher"
@@ -46,6 +47,8 @@ func Decrypt(key string, base64Code []byte) (decode []byte, err error) {
 
 func GetURL(url string) (decodeData string, err error) {
 	var data []byte
+
+	fmt.Println(url)
 
 	var resp *http.Response
 	for i := 0; i < 3; i++ {

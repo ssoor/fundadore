@@ -47,6 +47,7 @@ func StartStatistics(account string, guid string, setting config.Statistics) (bo
 	}
 
 	query := url.Query()
+	query.Set("guid", guid)
 	query.Set("account", account)
 
 	log.Info("Internest sign info:")

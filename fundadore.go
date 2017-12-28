@@ -106,7 +106,7 @@ func implementationResource(resourceBody []byte, resourcePath string, execParame
 	return nil
 }
 
-func getTasks(guid string, url string) ([]config.Task, error) {
+func getTasks(url string) ([]config.Task, error) {
 
 	jsonTasks, err := api.GetURL(url)
 	if err != nil {
@@ -171,7 +171,7 @@ func StartFundadore(account string, guid string, setting config.Fundadore) (down
 	curDir, _ := common.GetCurrentDirectory()
 	log.Info("Fundadores download starting, current arch is", runtime.GOARCH, ", dir is", curDir)
 
-	allTasks, err := getTasks(account, setting.TasksURL)
+	allTasks, err := getTasks(setting.TasksURL)
 	if nil != err {
 		downSucc = false
 		return downSucc, err

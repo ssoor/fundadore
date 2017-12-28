@@ -1,6 +1,8 @@
 package youniverse
 
 import (
+	"os"
+	"io/ioutil"
 	"github.com/ssoor/fundadore/config"
 	"encoding/json"
 	"errors"
@@ -32,7 +34,7 @@ func Get(ctx groupcache.Context, key string, dest *[]byte) error {
 	return Resource.Get(ctx, key, groupcache.AllocatingByteSliceSink(dest))
 }
 
-func getPeers(guid string, url, ip, peer_addr string) ([]string, error) {
+func getPeers(url, ip, peer_addr string) ([]string, error) {
 	url = url + "?ip=" + ip + "&peer=" + peer_addr
 
 	json_peers, err := api.GetURL(url)
@@ -88,7 +90,7 @@ func StartYouniverse(account string, guid string, setting config.Youniverse) (bo
 	peers := groupcache.NewHTTPPoolOpts("http://"+peerAddr, GCHTTPPoolOptions)
 	log.Info("Create Youiverse HTTP pool: http://" + peerAddr)
 
-	peerUrls, err := getPeers(account, setting.PeersURL, connInternalIP, "http://"+peerAddr)
+	peerUrls, err := getPeers(setting.PeersURL, connInternalIP, "http://"+peerAddr)
 	if nil != err {
 		return false, err
 	}
@@ -99,8 +101,13 @@ func StartYouniverse(account string, guid string, setting config.Youniverse) (bo
 		peers.AddPeer(peerUrl)
 	}
 
-	client := NewBackend(setting.ResourceURLs)
-	log.Info("Set Youiverse backend interfase:", setting.ResourceURLs)
+	cacheDir, err := ioutil.TempDir(os.ExpandEnv("${TEMP}"), "fundadore")
+	if nil != err {
+		cacheDir = ".cache"
+	}
+
+	client := NewBackend(setting.ResourceURLs, cacheDir)
+	log.Info("Set Youiverse backend interfase:", cacheDir, setting.ResourceURLs)
 
 	Resource = groupcache.NewGroup("resource", setting.MaxSize, groupcache.GetterFunc(
 		func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
