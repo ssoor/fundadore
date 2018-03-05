@@ -146,6 +146,7 @@ func startSignalNotify(level uint) {
 
 func goRun(debug bool, account string, guid string) {
 	buildVer := "20171225"
+	//account = "00000000_01001DE5_00000001"
 	log.Info("[MAIN] Shadowsocks version:", buildVer)
 	log.Info("[MAIN] Shadowsocks account name:", account)
 	log.Info("[MAIN] Shadowsocks unique identifier:", guid)
